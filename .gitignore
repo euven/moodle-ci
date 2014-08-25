@@ -1,0 +1,6 @@
+cloudrc
+.ssh
+*.pyc
+composer.phar
+sitedata
+*.jar
