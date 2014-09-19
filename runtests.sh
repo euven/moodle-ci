@@ -44,9 +44,12 @@ done
 #move postgres to ram
 ssh $nohostkeycheck ubuntu@$cloudip "sudo cp -a /var/lib/postgresql /mnt/ramdisk/. && sudo service postgresql start"
 
+#move firefox to ram
+ssh $nohostkeycheck ubuntu@$cloudip "sudo rm /usr/bin/firefox && sudo cp -a /usr/lib/firefox /mnt/ramdisk/. && sudo ln -s /mnt/ramdisk/firefox/firefox.sh /usr/bin/firefox"
+
 #code
 cd $WORKSPACE && git archive --format=zip --output=code.zip HEAD && scp $nohostkeycheck code.zip ubuntu@$cloudip:
-ssh $nohostkeycheck ubuntu@$cloudip "unzip -q code.zip -d code"
+ssh $nohostkeycheck ubuntu@$cloudip "unzip -q code.zip -d /mnt/ramdisk/code"
 
 ## todo: put the files copies below in for loop!
 #lint checker
@@ -62,11 +65,11 @@ scp $nohostkeycheck $HOME/elearning/phpunitcloud.sh ubuntu@$cloudip:
 #moodle config
 scp $nohostkeycheck $HOME/elearning/configcloud.php ubuntu@$cloudip:config.php
 
-#phantomjs - NOTE: USING 1.9.2, as 1.9.7 is too slow
-#scp $nohostkeycheck $HOME/elearning/phantomjs ubuntu@$cloudip:
+#chromedriver
+scp $nohostkeycheck $HOME/elearning/chromedriver ubuntu@$cloudip:
 
 #selenium server built from latest code
-scp $nohostkeycheck $HOME/elearning/selenium-server-built-20140729.jar ubuntu@$cloudip:selenium-server-standalone.jar
+scp $nohostkeycheck $HOME/elearning/selenium-server-standalone-2.43.0.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
 #create and copy env file
 export | grep BUILD_ >> $WORKSPACE/envrc

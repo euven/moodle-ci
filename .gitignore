@@ -4,3 +4,4 @@ cloudrc
 composer.phar
 sitedata
 *.jar
+chromedriver

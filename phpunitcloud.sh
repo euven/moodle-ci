@@ -1,12 +1,13 @@
 #!/bin/bash
 
-WORKSPACE=/home/ubuntu/code
+WORKSPACE=/mnt/ramdisk/code
+DEFAULTPORT=7000
 
 #check if this version has phpunit
 moodleversion=$(grep "\$release" $WORKSPACE/version.php | awk '{print $3}' | sed "s/'//g")
 if [[ $moodleversion < 2.3 ]]
 then
-    echo "No phpunit for this version of Moodle/Totara, so nothing to do :)"
+    echo "No phpunit for this version ($moodleversion) of Moodle/Totara, so nothing to do :)"
     exit
 fi
 
@@ -17,8 +18,8 @@ fi
 mkdir -p /mnt/ramdisk/sitedata/phpunit
 mkdir -p /mnt/ramdisk/sitedata/site  # some fake shiz that's needed
 
-dropdb jenkins /dev/null 2>&1  # just in case ;)
-createdb -E utf8 jenkins
+dropdb db-$DEFAULTPORT /dev/null 2>&1  # just in case ;)
+createdb -E utf8 db-$DEFAULTPORT
 
 cd $WORKSPACE
 

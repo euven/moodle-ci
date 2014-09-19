@@ -21,7 +21,7 @@ class cloudslave:
         if not image:
             raise Exception('Could not find image...')
 
-        flavor = nova.flavors.find(name="c1.c4r4")
+        flavor = nova.flavors.find(name="c1.c8r8")
         if not flavor:
             raise Exception('Could not find flavor...')
 

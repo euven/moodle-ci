@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORKSPACE=code
+WORKSPACE=/mnt/ramdisk/code
 
 echo "CHECKING FOR SYNTAX ERRORS"
 #find $WORKSPACE -path $WORKSPACE/vendor -prune -o -type f -name '*.php' -print0 | xargs -0L1 php -l
