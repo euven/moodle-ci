@@ -2,7 +2,7 @@
 
 WORKSPACE=/mnt/ramdisk/code
 
-echo "CHECKING FOR SYNTAX ERRORS"
+echo "CHECKING FOR SYNTAX ERRORS..."
 #find $WORKSPACE -path $WORKSPACE/vendor -prune -o -type f -name '*.php' -print0 | xargs -0L1 php -l
 
 if [ -e $WORKSPACE/linterrors ]; then
@@ -15,11 +15,13 @@ fi
 #    php -l "$file" 2>> $WORKSPACE/linterrors # run linter on file
 #done
 
-find $WORKSPACE -path $WORKSPACE/vendor -prune -o -type f -name '*.php' | parallel php -l "{}" 2>> $WORKSPACE/linterrors
+find $WORKSPACE -path $WORKSPACE/vendor -prune -o -type f -name '*.php' | parallel php -l "{}" 2>> $WORKSPACE/linterrors | grep -v "^No syntax errors detected"
 
 if [ -s $WORKSPACE/linterrors ]; then  # check the size here, as -e doesn't play nicely
     echo "SYNTAX ERRORS FOUND:"
     cat $WORKSPACE/linterrors
     exit 1
+else
+    echo "No syntax errors found :)"
 fi
 

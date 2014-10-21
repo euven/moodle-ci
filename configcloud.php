@@ -5,8 +5,10 @@ global $CFG;
 $CFG = new stdClass();
 
 $phpport = 7000;
-if (getenv('PHPPORT')) {
+if (getenv('PHPPORT')) {  // set by behat tests
     $phpport = getenv('PHPPORT');
+} elseif (getenv('PHPUNITTEST')) {  // set by phpunit tests
+    $phpport = getenv('PHPUNITTEST');
 } elseif (!empty($_SERVER['SERVER_PORT'])) {
     $phpport = $_SERVER['SERVER_PORT'];
 }
@@ -59,7 +61,7 @@ $CFG->behat_config = array(
 
 #phpunit setup
 $CFG->phpunit_prefix = 'phpu_';
-$CFG->phpunit_dataroot = '/mnt/ramdisk/sitedata/phpunit';
+$CFG->phpunit_dataroot = '/mnt/ramdisk/sitedata/phpunit-'.$phpport;
 
 unset($phpport);
 

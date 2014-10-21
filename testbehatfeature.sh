@@ -3,7 +3,7 @@
 FEATUREFILE=$1  # this must be an absolute path to the feature file
 FEATURE=`basename $FEATUREFILE``echo $FEATUREFILE | md5sum | awk '{print substr($1,1,6)}'` # ensure uniqueness
 CODEHOME=/mnt/ramdisk/code
-DEFAULTPORT=7000  # the default port set in configcloud.php, when now port is present
+DEFAULTPORT=7000  # the default port set in configcloud.php, when no port is present
 
 # first get a unique random port and fire up the webserver
 # we need to ignore anything below 6000, as selenium goes there

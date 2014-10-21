@@ -11,6 +11,7 @@ then
     exit
 fi
 
+echo "RUNNING BEHAT TESTS";
 
 ##
 ## SETUP
@@ -23,6 +24,7 @@ createdb -E utf8 db-7000
 
 #add selenium - no way to get most current version yet :( #todo
 #wget --no-verbose http://selenium-release.storage.googleapis.com/2.42/selenium-server-standalone-2.42.2.jar -O selenium-server-standalone.jar
+
 
 #add composer
 cd $WORKSPACE
@@ -58,7 +60,7 @@ for node in $(seq 1 $NODECOUNT); do
     echo "Starting selenium node on port $PORT"
     # use ramdisk, as this will create the browser profile in ram
     #DISPLAY=:$NUMDISPLAY nohup java -Djava.io.tmpdir=/mnt/ramdisk -jar $HOME/selenium-server-standalone.jar -role node -hub $HUB -port $PORT -timeout 0 -maxSession 1 -browserSessionReuse -Dwebdriver.chrome.driver=$HOME/chromedriver > /dev/null 2>&1 & echo $!
-    DISPLAY=:$NUMDISPLAY nohup java -Djava.io.tmpdir=/mnt/ramdisk -jar $HOME/selenium-server-standalone.jar -role node -hub $HUB -port $PORT -timeout 0 -maxSession 1 -browserTimeout 1000 > /dev/null 2>&1 & echo $!
+    DISPLAY=:$NUMDISPLAY nohup java -Djava.io.tmpdir=/mnt/ramdisk -jar $HOME/selenium-server-standalone.jar -role node -hub $HUB -port $PORT -timeout 0 -maxSession 1 -browserTimeout 1000 -browserSessionReuse > /dev/null 2>&1 & echo $!
     sleep 5
 done
 
@@ -67,7 +69,6 @@ done
 ### Run tests
 ###
 echo "RUNNING BEHAT TESTS"
-#find $HOME/code ! -path "$HOME/code/vendor/*" -type f -name '*.feature' | parallel --delay 5 --jobs -1 bash $HOME/testbehatfeature.sh {} #|| exit 1
 # make sure the biggest tests get run first, to ensure max cpu utilisation
-find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}'| parallel --load 80% --delay 7 bash $HOME/testbehatfeature.sh {}
+find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | parallel --jobs 75% --delay 2 bash $HOME/testbehatfeature.sh {}
 exit $?

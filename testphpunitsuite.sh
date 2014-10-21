@@ -1,8 +1,7 @@
 #!/bin/bash
 
-TESTFILE=$1  # this must be an absolute path to the feature file
-#PHPUNITTEST=`basename $TESTFILE`
-PHPUNITTEST=`basename $TESTFILE``md5sum $TESTFILE | awk '{ print substr($1,1,6) }'`
+TESTSUITE=$1  # a full suite name
+PHPUNITTEST=`echo "$TESTSUITE" | awk '{print $1}'``echo "$TESTSUITE" | md5sum | awk '{print $1}'`  # add md5 for some uniqueness
 export PHPUNITTEST
 CODEHOME=/mnt/ramdisk/code
 DEFAULTPORT=7000  # the default port set in configcloud.php, when no port is present
@@ -21,8 +20,8 @@ cp -a /mnt/ramdisk/sitedata/phpunit-$DEFAULTPORT /mnt/ramdisk/sitedata/phpunit-$
 rm -rf /mnt/ramdisk/sitedata/phpunit-$PHPUNITTEST/muc /mnt/ramdisk/sitedata/phpunit-$PHPUNITTEST/phpunit/lock
 
 # run run run bananaphone!
-echo "Testing $TESTFILE"
-$CODEHOME/vendor/bin/phpunit $TESTFILE
+echo "Testing suite $TESTSUITE"
+$CODEHOME/vendor/bin/phpunit --testsuite "$TESTSUITE"
 phpunitresult=$?
 cleanup
 exit $phpunitresult

@@ -61,6 +61,7 @@ scp $nohostkeycheck $HOME/elearning/testbehatfeature.sh ubuntu@$cloudip:
 
 #phpunit script
 scp $nohostkeycheck $HOME/elearning/phpunitcloud.sh ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/elearning/testphpunitsuite.sh ubuntu@$cloudip:
 
 #moodle config
 scp $nohostkeycheck $HOME/elearning/configcloud.php ubuntu@$cloudip:config.php
@@ -69,7 +70,7 @@ scp $nohostkeycheck $HOME/elearning/configcloud.php ubuntu@$cloudip:config.php
 scp $nohostkeycheck $HOME/elearning/chromedriver ubuntu@$cloudip:
 
 #selenium server built from latest code
-scp $nohostkeycheck $HOME/elearning/selenium-server-standalone-2.43.0.jar ubuntu@$cloudip:selenium-server-standalone.jar
+scp $nohostkeycheck $HOME/elearning/selenium-server-standalone-2.43.1.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
 #create and copy env file
 export | grep BUILD_ >> $WORKSPACE/envrc
@@ -88,6 +89,16 @@ if [[ $* == *lint* ]]; then
 fi
 
 ##
+## Run phpunit tests
+##
+if [[ $* == *phpunit* ]]; then
+    ssh $nohostkeycheck ubuntu@$cloudip "bash phpunitcloud.sh"
+    if [[ $? > 0 ]]; then
+        exit 1
+    fi
+fi
+
+##
 ## Run behat tests
 ##
 if [[ $* == *behat* ]]; then
@@ -97,15 +108,7 @@ if [[ $* == *behat* ]]; then
     fi
 fi
 
-##
-## Run phpunit tests
-##
-if [[ $* == *phpunit* ]]; then
-    ssh $nohostkeycheck ubuntu@$cloudip "bash phpunitcloud.sh"
-    if [[ $? > 0 ]]; then
-        exit 1
-    fi
-fi
+
 
 #traps don't work yet: https://issues.jenkins-ci.org/browse/JENKINS-17116
 #trap "cleanup" SIGHUP SIGINT SIGTERM SIGQUIT EXIT
