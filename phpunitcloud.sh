@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source envrc
 CODEHOME=/mnt/ramdisk/code
 DEFAULTPORT=7000
 
@@ -28,7 +29,7 @@ cd $CODEHOME
 
 #add composer
 curl http://getcomposer.org/installer | php
-php composer.phar config github-oauth.github.com 21a8cb94266d3373f2bfb35a9d98f92063bf8ab9  # to deal with github limits
+php composer.phar config github-oauth.github.com $GITHUB_TOKEN  # use token to deal with github limits
 #php composer.phar install --dev
 php composer.phar install
 
@@ -45,5 +46,6 @@ php $CODEHOME/admin/tool/phpunit/cli/init.php
 echo "RUNNING PHPUNIT TESTS"
 #vendor/bin/phpunit
 #find $CODEHOME ! -path "$CODEHOME/vendor/*" -path "*/tests/*_test.php" -type f -printf '%s %p\n' | sort -rn | awk '{print $2}' | parallel bash $HOME/testphpunitfile.sh "{}"
+#find all the test suites by parsing phpunit.xml; run test suites in parallel
 xmlstarlet sel -T -t -m '//phpunit/testsuites/testsuite/@name' -v '.' -n $CODEHOME/phpunit.xml | parallel bash $HOME/testphpunitsuite.sh "{}"
 exit $?

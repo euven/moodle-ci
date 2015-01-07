@@ -1,11 +1,16 @@
 import os
 import time
 import novaclient.v1_1.client as nvclient
+import novaclient.exceptions
 from credentials import get_nova_creds
 
 class cloudslave:
     def __init__(self, name):
         self.name = name
+        self.imagename = "jenkins-tests"
+        self.flavorname = "c1.c4r4"
+        #self.flavorname = "c1.c8r8"
+        self.sshkeyname = "jenkins"
 
     def spinup(self):
         # initialise novaclient instance
@@ -15,13 +20,13 @@ class cloudslave:
         # ensure jenkins' pubkey is loaded
         if not nova.keypairs.findall(name="jenkins"):
             with open(os.path.expanduser('/var/lib/jenkins/.ssh/id_rsa.pub')) as fpubkey:
-                nova.keypairs.create(name="jenkins", public_key=fpubkey.read())
+                nova.keypairs.create(name=self.sshkeyname, public_key=fpubkey.read())
 
-        image = nova.images.find(name="jenkins")
+        image = nova.images.find(name=self.imagename)
         if not image:
             raise Exception('Could not find image...')
 
-        flavor = nova.flavors.find(name="c1.c8r8")
+        flavor = nova.flavors.find(name=self.flavorname)
         if not flavor:
             raise Exception('Could not find flavor...')
 
@@ -61,9 +66,22 @@ class cloudslave:
         creds = get_nova_creds()
         nova = nvclient.Client(**creds)
 
-	instance = nova.servers.find(name=self.name)
-        if instance:
-            instance.delete()
-            return True
-        else:
-            return False
+	maxtries = 10
+	trycount = 0
+	while 1:
+            try:
+	        instance = nova.servers.find(name=self.name)
+                if instance:
+                    instance.delete()
+                    return True
+                else:
+                    return False
+            except novaclient.exceptions.ClientException:
+                print 'Problem retrieving server instance...'
+                if trycount > maxtries:
+                    return False
+
+                print 'retrying...'
+                time.sleep(5)  # wait a bit and try again
+                trycount = trycount + 1
+                continue

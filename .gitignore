@@ -1,7 +1,8 @@
-cloudrc
+config.sh
 .ssh
 *.pyc
 composer.phar
 sitedata
 *.jar
 chromedriver
+gitcaches/*

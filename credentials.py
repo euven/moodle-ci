@@ -15,4 +15,5 @@ def get_nova_creds():
     d['api_key'] = os.environ['OS_PASSWORD']
     d['auth_url'] = os.environ['OS_AUTH_URL']
     d['project_id'] = os.environ['OS_TENANT_NAME']
+    d['region_name'] = os.environ['OS_REGION_NAME']
     return d

@@ -5,7 +5,7 @@ nohostkeycheck="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 ##
 ## spin up cloud instance
 ##
-source $HOME/elearning/cloudrc
+source $HOME/elearning/config.sh
 python $HOME/elearning/spinup.py $BUILD_TAG  # this will write an ip to a file in /tmp
 retval=$?
 if [ ! $retval -eq 0 ]; then
@@ -41,6 +41,9 @@ done
 ##
 ## prepare cloud instance with necessary files, etc.
 ##
+#first, fix the hostname
+ssh $nohostkeycheck ubuntu@$cloudip "echo \"127.0.0.1 \`hostname\`\" | sudo tee -a /etc/hosts" > /dev/null 2>&1
+
 #move postgres to ram
 ssh $nohostkeycheck ubuntu@$cloudip "sudo cp -a /var/lib/postgresql /mnt/ramdisk/. && sudo service postgresql start"
 
@@ -69,12 +72,17 @@ scp $nohostkeycheck $HOME/elearning/configcloud.php ubuntu@$cloudip:config.php
 #chromedriver
 scp $nohostkeycheck $HOME/elearning/chromedriver ubuntu@$cloudip:
 
-#selenium server built from latest code
+#selenium server
 scp $nohostkeycheck $HOME/elearning/selenium-server-standalone-2.43.1.jar ubuntu@$cloudip:selenium-server-standalone.jar
+
+#composer cache, so we don't need to download all the packages every time
+scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
+
 
 #create and copy env file
 export | grep BUILD_ >> $WORKSPACE/envrc
 export | grep JOB_ >> $WORKSPACE/envrc
+export | grep GITHUB >> $WORKSPACE/envrc
 scp $nohostkeycheck $WORKSPACE/envrc ubuntu@$cloudip:
 
 
@@ -108,6 +116,8 @@ if [[ $* == *behat* ]]; then
     fi
 fi
 
+# sync back any composer cache updates
+rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.composer/ $HOME/.composer
 
 
 #traps don't work yet: https://issues.jenkins-ci.org/browse/JENKINS-17116
@@ -115,6 +125,9 @@ fi
 
 # cleanup
 cleanup() {
+    # clean the workspace, as we need to conserve space
+    rm -r $WORKSPACE
+
     # clean the cloud!
     python $HOME/elearning/spindown.py $BUILD_TAG
 }

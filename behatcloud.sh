@@ -29,7 +29,7 @@ createdb -E utf8 db-7000
 #add composer
 cd $WORKSPACE
 curl http://getcomposer.org/installer | php
-php composer.phar config github-oauth.github.com 21a8cb94266d3373f2bfb35a9d98f92063bf8ab9  # to deal with github limits
+php composer.phar config github-oauth.github.com $GITHUB_TOKEN  # to deal with github limits
 
 #add config
 cp $HOME/config.php $WORKSPACE/.
@@ -69,6 +69,10 @@ done
 ### Run tests
 ###
 echo "RUNNING BEHAT TESTS"
-# make sure the biggest tests get run first, to ensure max cpu utilisation
-find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | parallel --jobs 75% --delay 2 bash $HOME/testbehatfeature.sh {}
+# find all feature files - make sure the biggest tests get run first, to ensure max cpu utilisation
+#find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | parallel --jobs 60% --delay 7 bash $HOME/testbehatfeature.sh {}
+
+# only run the @catalyst tagged tests
+find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | xargs grep -l "@catalyst" | parallel --jobs 60% --delay 7 bash $HOME/testbehatfeature.sh {}
+
 exit $?
