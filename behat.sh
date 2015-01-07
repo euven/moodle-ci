@@ -18,28 +18,28 @@ cd $WORKSPACE
 git reset --hard HEAD
 git clean -df
 
-rm -rf $HOME/elearning/sitedata/behat_$JOB_NAME/*
-find $HOME/elearning/sitedata/behat_$JOB_NAME -name ".*" -exec rm -rf {} \;
+rm -rf $HOME/moodle-ci/sitedata/behat_$JOB_NAME/*
+find $HOME/moodle-ci/sitedata/behat_$JOB_NAME -name ".*" -exec rm -rf {} \;
 # just in case, clear the fake site dir too
-rm -rf $HOME/elearning/sitedata/site/*
-find $HOME/elearning/sitedata/site -name ".*" -exec rm -rf {} \;
+rm -rf $HOME/moodle-ci/sitedata/site/*
+find $HOME/moodle-ci/sitedata/site -name ".*" -exec rm -rf {} \;
 
 dropdb $JOB_NAME
 createdb -O jenkins -E utf8 $JOB_NAME
 
 #add composer
 curl http://getcomposer.org/installer | php
-#cp $HOME/elearning/composer.phar $WORKSPACE/.
+#cp $HOME/moodle-ci/composer.phar $WORKSPACE/.
 
 #add config
-cp $HOME/elearning/config.php $WORKSPACE/.
+cp $HOME/moodle-ci/config.php $WORKSPACE/.
 
 #set up behat
 #php $WORKSPACE/admin/tool/behat/cli/util.php --drop
 php $WORKSPACE/admin/tool/behat/cli/init.php 
 
 # get the generated conf file
-behatconf=$HOME/elearning/sitedata/behat_$JOB_NAME/behat/behat.yml
+behatconf=$HOME/moodle-ci/sitedata/behat_$JOB_NAME/behat/behat.yml
 
 
 
@@ -93,7 +93,7 @@ then
 	Xvfb :10 -ac > /dev/null 2>&1 & echo $!
 
 	echo "Starting Selenium ..."
-	nohup java -jar $HOME/elearning/selenium-server-standalone-2.39.0.jar > /dev/null 2>&1 & echo $!
+	nohup java -jar $HOME/moodle-ci/selenium-server-standalone-2.39.0.jar > /dev/null 2>&1 & echo $!
 
 	export DISPLAY=$currentdisplay
 

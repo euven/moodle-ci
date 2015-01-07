@@ -5,8 +5,8 @@ nohostkeycheck="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 ##
 ## spin up cloud instance
 ##
-source $HOME/elearning/config.sh
-python $HOME/elearning/spinup.py $BUILD_TAG  # this will write an ip to a file in /tmp
+source $HOME/moodle-ci/config.sh
+python $HOME/moodle-ci/spinup.py $BUILD_TAG  # this will write an ip to a file in /tmp
 retval=$?
 if [ ! $retval -eq 0 ]; then
     echo "Cloud instance creation failed :("
@@ -56,24 +56,24 @@ ssh $nohostkeycheck ubuntu@$cloudip "unzip -q code.zip -d /mnt/ramdisk/code"
 
 ## todo: put the files copies below in for loop!
 #lint checker
-scp $nohostkeycheck $HOME/elearning/lintcheckercloud.sh ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/moodle-ci/lintcheckercloud.sh ubuntu@$cloudip:
 
 #behat scripts
-scp $nohostkeycheck $HOME/elearning/behatcloud.sh ubuntu@$cloudip:
-scp $nohostkeycheck $HOME/elearning/testbehatfeature.sh ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/moodle-ci/behatcloud.sh ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/moodle-ci/testbehatfeature.sh ubuntu@$cloudip:
 
 #phpunit script
-scp $nohostkeycheck $HOME/elearning/phpunitcloud.sh ubuntu@$cloudip:
-scp $nohostkeycheck $HOME/elearning/testphpunitsuite.sh ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/moodle-ci/phpunitcloud.sh ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/moodle-ci/testphpunitsuite.sh ubuntu@$cloudip:
 
 #moodle config
-scp $nohostkeycheck $HOME/elearning/configcloud.php ubuntu@$cloudip:config.php
+scp $nohostkeycheck $HOME/moodle-ci/configcloud.php ubuntu@$cloudip:config.php
 
 #chromedriver
-scp $nohostkeycheck $HOME/elearning/chromedriver ubuntu@$cloudip:
+scp $nohostkeycheck $HOME/moodle-ci/chromedriver ubuntu@$cloudip:
 
 #selenium server
-scp $nohostkeycheck $HOME/elearning/selenium-server-standalone-2.43.1.jar ubuntu@$cloudip:selenium-server-standalone.jar
+scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-2.43.1.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
 #composer cache, so we don't need to download all the packages every time
 scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
@@ -129,5 +129,5 @@ cleanup() {
     rm -r $WORKSPACE
 
     # clean the cloud!
-    python $HOME/elearning/spindown.py $BUILD_TAG
+    python $HOME/moodle-ci/spindown.py $BUILD_TAG
 }

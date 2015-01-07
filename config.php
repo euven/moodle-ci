@@ -20,7 +20,7 @@ $CFG->dboptions = array (
 );
 
 $CFG->wwwroot   = 'http://127.0.0.1/'.$JOBNAME;
-$CFG->dataroot  = '/var/lib/jenkins/elearning/sitedata/site';  # just a real fake, cos it's needed :D
+$CFG->dataroot  = '/var/lib/jenkins/moodle-ci/sitedata/site';  # just a real fake, cos it's needed :D
 $CFG->admin     = 'admin';
 
 $CFG->directorypermissions = 0777;
@@ -31,13 +31,13 @@ $CFG->noemailever = true;  // turn off all emails
 
 #behat setup
 $CFG->behat_prefix = 'behat_';
-$CFG->behat_dataroot = '/var/lib/jenkins/elearning/sitedata/behat_'.$JOBNAME;
+$CFG->behat_dataroot = '/var/lib/jenkins/moodle-ci/sitedata/behat_'.$JOBNAME;
 $CFG->behat_wwwroot   = 'http://'.$JOBNAME.'.localhost:8000';
 #$CFG->behat_switchcompletely = true;  # for php 5.3
 
 #phpunit setup
 $CFG->phpunit_prefix = 'phpu_';
-$CFG->phpunit_dataroot = '/var/lib/jenkins/elearning/sitedata/phpunit_'.$JOBNAME;
+$CFG->phpunit_dataroot = '/var/lib/jenkins/moodle-ci/sitedata/phpunit_'.$JOBNAME;
 
 unset($JOBNAME);
 

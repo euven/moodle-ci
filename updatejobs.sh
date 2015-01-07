@@ -7,5 +7,5 @@ for conffile in $configs
 do
     # make/update jenkins jobs
     echo "`date` - UPDATE JOBS FOR $conffile"
-    /usr/local/bin/jenkins-makejobs-git $JENKINSHOME/elearning/$conffile
+    /usr/local/bin/jenkins-makejobs-git $JENKINSHOME/moodle-ci/$conffile
 done
