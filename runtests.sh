@@ -5,6 +5,10 @@ nohostkeycheck="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 ##
 ## spin up cloud instance
 ##
+echo ""
+echo "########## Spawn cloud instance"
+echo ""
+
 source $HOME/moodle-ci/config.sh
 python $HOME/moodle-ci/spinup.py $BUILD_TAG  # this will write an ip to a file in /tmp
 retval=$?
@@ -41,6 +45,10 @@ done
 ##
 ## prepare cloud instance with necessary files, etc.
 ##
+echo ""
+echo "########## Prepare cloud instance"
+echo ""
+
 #first, fix the hostname
 ssh $nohostkeycheck ubuntu@$cloudip "echo \"127.0.0.1 \`hostname\`\" | sudo tee -a /etc/hosts" > /dev/null 2>&1
 
@@ -70,14 +78,13 @@ scp $nohostkeycheck $HOME/moodle-ci/testphpunitsuite.sh ubuntu@$cloudip:
 scp $nohostkeycheck $HOME/moodle-ci/configcloud.php ubuntu@$cloudip:config.php
 
 #chromedriver
-scp $nohostkeycheck $HOME/moodle-ci/chromedriver ubuntu@$cloudip:
+#scp $nohostkeycheck $HOME/moodle-ci/chromedriver ubuntu@$cloudip:
 
 #selenium server
 scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-$SELENIUM_VERSION.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
 #composer cache, so we don't need to download all the packages every time
 scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
-
 
 #create and copy env file
 export | grep BUILD_ >> $WORKSPACE/envrc
@@ -89,6 +96,10 @@ scp $nohostkeycheck $WORKSPACE/envrc ubuntu@$cloudip:
 ##
 ## Lint!
 ##
+echo ""
+echo "########## Check syntax"
+echo ""
+
 if [[ $* == *lint* ]]; then
     ssh $nohostkeycheck ubuntu@$cloudip "bash lintcheckercloud.sh"
     if [[ $? > 0 ]]; then
@@ -99,6 +110,10 @@ fi
 ##
 ## Run phpunit tests
 ##
+echo ""
+echo "########## Run PHPUnit"
+echo ""
+
 if [[ $* == *phpunit* ]]; then
     ssh $nohostkeycheck ubuntu@$cloudip "bash phpunitcloud.sh"
     if [[ $? > 0 ]]; then
@@ -109,6 +124,10 @@ fi
 ##
 ## Run behat tests
 ##
+echo ""
+echo "########## Run Behat"
+echo ""
+
 if [[ $* == *behat* ]]; then
     ssh $nohostkeycheck ubuntu@$cloudip "bash behatcloud.sh"
     if [[ $? > 0 ]]; then
