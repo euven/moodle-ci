@@ -16,3 +16,4 @@ export OS_REGION_NAME=
 ## Other
 ##
 export GITHUB_TOKEN=
+export SELENIUM_VERSION=

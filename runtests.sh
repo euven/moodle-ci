@@ -73,7 +73,7 @@ scp $nohostkeycheck $HOME/moodle-ci/configcloud.php ubuntu@$cloudip:config.php
 scp $nohostkeycheck $HOME/moodle-ci/chromedriver ubuntu@$cloudip:
 
 #selenium server
-scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-2.43.1.jar ubuntu@$cloudip:selenium-server-standalone.jar
+scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-$SELENIUM_VERSION.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
 #composer cache, so we don't need to download all the packages every time
 scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
