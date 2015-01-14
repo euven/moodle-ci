@@ -40,7 +40,7 @@ sed -i "s/localhost:$DEFAULTPORT/localhost:$PHPPORT/g" /mnt/ramdisk/sitedata/beh
 
 # run run run bananaphone!
 echo "Testing $FEATUREFILE"
-$CODEHOME/vendor/bin/behat --config /mnt/ramdisk/sitedata/behat-$PHPPORT/behat/behat.yml --tags "~@_file_upload" $FEATUREFILE
+$CODEHOME/vendor/bin/behat --ansi --config /mnt/ramdisk/sitedata/behat-$PHPPORT/behat/behat.yml --tags "~@_file_upload" $FEATUREFILE
 #$CODEHOME/vendor/bin/behat --config /mnt/ramdisk/sitedata/behat-$PHPPORT/behat/behat.yml --tags "~@javascript" $FEATUREFILE
 behatresult=$?
 cleanup

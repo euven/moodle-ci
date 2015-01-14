@@ -21,7 +21,7 @@ rm -rf /mnt/ramdisk/sitedata/phpunit-$PHPUNITTEST/muc /mnt/ramdisk/sitedata/phpu
 
 # run run run bananaphone!
 echo "Testing suite $TESTSUITE"
-$CODEHOME/vendor/bin/phpunit --testsuite "$TESTSUITE"
+$CODEHOME/vendor/bin/phpunit --colors --testsuite "$TESTSUITE"
 phpunitresult=$?
 cleanup
 exit $phpunitresult
