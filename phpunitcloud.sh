@@ -37,7 +37,7 @@ php composer.phar install
 cp $HOME/config.php $CODEHOME/.
 
 #set up phpunit
-php $CODEHOME/admin/tool/phpunit/cli/init.php
+php $CODEHOME/admin/tool/phpunit/cli/init.php || exit 1
 
 
 ###

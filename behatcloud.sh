@@ -35,7 +35,7 @@ php composer.phar config github-oauth.github.com $GITHUB_TOKEN  # to deal with g
 cp $HOME/config.php $WORKSPACE/.
 
 #set up behat
-php $WORKSPACE/admin/tool/behat/cli/init.php 
+php $WORKSPACE/admin/tool/behat/cli/init.php || exit 1
 
 
 ###
