@@ -21,7 +21,10 @@ sudo pip install python-novaclient
 * Create an ssh key pair for jenkins; add the public key to openstack, with a key name of: jenkins
 * As the jenkins user, checkout this repo to `/var/lib/jenkins/moodle-ci`
 * Download Selenium's standalone server (version: $SELENIUM_VERSION) and stick it in `/var/lib/jenkins/moodle-ci/` too
-* Configure a jenkins job to execute `runtests.sh` when a build is triggered
+* `cp config-dist.sh config.sh` and fill in creds
+* Configure a jenkins job to:
+  * execute `runtests.sh` when a build is triggered
+  * execute `cleanup.sh` as a post-build script (bash traps don't seem to work yet)
 
 ### openstack snapshot
 To prepare the snapshot for running Moodle/Totara tests, start off by installing the following:
