@@ -7,7 +7,7 @@ from credentials import get_nova_creds
 class cloudslave:
     def __init__(self, name):
         self.name = name
-        self.imagename = "jenkins-tests"
+        self.imagename = "jenkinstest"
         self.flavorname = "c1.c4r4"
         #self.flavorname = "c1.c8r8"
         self.sshkeyname = "jenkins"

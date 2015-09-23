@@ -1,6 +1,8 @@
 #!/bin/bash
-
+ls /var/lib/go-agent/
 nohostkeycheck="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+WORKSPACE=/var/lib/go-agent/pipelines/$GO_PIPELINE_NAME
+BUILDNAME=$GO_PIPELINE_NAME-$GO_PIPELINE_COUNTER
 
 ##
 ## spin up cloud instance
@@ -10,19 +12,31 @@ echo "########## Spawn cloud instance"
 echo ""
 
 source $HOME/moodle-ci/config.sh
-python $HOME/moodle-ci/spinup.py $BUILD_TAG  # this will write an ip to a file in /tmp
+python $HOME/moodle-ci/spinup.py $BUILDNAME  # this will write an ip to a file in /tmp
 retval=$?
 if [ ! $retval -eq 0 ]; then
     echo "Cloud instance creation failed :("
     exit 1
 fi
 
-if [ ! -f /tmp/$BUILD_TAG ]; then
+# add a trap here to clean up the cloud if anything goes wrang from now on
+trap "cleanup" SIGHUP SIGINT SIGTERM SIGQUIT EXIT
+cleanup() {
+
+    # clean the cloud!
+    echo 'clean clean cloud!'
+    python $HOME/moodle-ci/spindown.py $BUILDNAME
+
+    # clean the workspace, as we need to conserve space
+    rm -rf $WORKSPACE
+}
+
+if [ ! -f /tmp/$BUILDNAME ]; then
     echo "could not find cloud instance for this job..."
     exit 1
 fi
 
-cloudip=`cat /tmp/$BUILD_TAG`
+cloudip=`cat /tmp/$BUILDNAME`
 # wait for ssh access - sometimes it takes a while for the floating ip to be assigned to the cloud instance
 sshtrycount=0
 while [ 1 ]; do
@@ -83,12 +97,13 @@ scp $nohostkeycheck $HOME/moodle-ci/configcloud.php ubuntu@$cloudip:config.php
 #selenium server
 scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-$SELENIUM_VERSION.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
-#composer cache, so we don't need to download all the packages every time
-scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
+#composer cache, so we don't need to download all the packages every time (behat-relevant)
+if [ -f $HOME/.composer ]; then
+    scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip
+fi
 
 #create and copy env file
-export | grep BUILD_ >> $WORKSPACE/envrc
-export | grep JOB_ >> $WORKSPACE/envrc
+export | grep GO_ >> $WORKSPACE/envrc
 export | grep GITHUB >> $WORKSPACE/envrc
 scp $nohostkeycheck $WORKSPACE/envrc ubuntu@$cloudip:
 
@@ -135,18 +150,7 @@ if [[ $* == *behat* ]]; then
     fi
 fi
 
-# sync back any composer cache updates
-rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.composer/ $HOME/.composer
-
-
-#traps don't work yet: https://issues.jenkins-ci.org/browse/JENKINS-17116
-#trap "cleanup" SIGHUP SIGINT SIGTERM SIGQUIT EXIT
-
-# cleanup
-cleanup() {
-    # clean the workspace, as we need to conserve space
-    rm -r $WORKSPACE
-
-    # clean the cloud!
-    python $HOME/moodle-ci/spindown.py $BUILD_TAG
-}
+# sync back any composer cache updates (behat-relevant)
+if (ssh $nohostkeycheck ubuntu@$cloudip [ -d .composer ]); then
+	rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.composer/ $HOME/.composer
+fi
