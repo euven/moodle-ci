@@ -1,6 +1,6 @@
 import os
 import time
-import novaclient.v1_1.client as nvclient
+from novaclient import client
 import novaclient.exceptions
 from credentials import get_nova_creds
 
@@ -15,7 +15,7 @@ class cloudslave:
     def spinup(self):
         # initialise novaclient instance
         creds = get_nova_creds()
-        nova = nvclient.Client(**creds)
+        nova = client.Client('2', **creds)
 
         # ensure jenkins' pubkey is loaded
         if not nova.keypairs.findall(name=self.sshkeyname):
@@ -64,7 +64,7 @@ class cloudslave:
 
     def spindown(self):
         creds = get_nova_creds()
-        nova = nvclient.Client(**creds)
+        nova = client.Client('2', **creds)
 
 	maxtries = 10
 	trycount = 0
