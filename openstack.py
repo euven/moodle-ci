@@ -50,7 +50,7 @@ class cloudslave:
 	for fip in floating_ips:
             if fip.instance_id is None:  # not assigned to another instance
                 self.ip = fip.ip
-        	self.instance.add_floating_ip(self.ip)
+                self.instance.add_floating_ip(self.ip)
                 break
         try:
             self.ip
