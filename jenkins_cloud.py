@@ -10,16 +10,16 @@ class cloudslave:
         self.imagename = "jenkinstest"
         self.flavorname = "c1.c4r4"
         #self.flavorname = "c1.c8r8"
-        self.sshkeyname = "jenkins"
+        self.sshkeyname = "gocd"
 
     def spinup(self):
         # initialise novaclient instance
         creds = get_nova_creds()
         nova = nvclient.Client(**creds)
 
-        # ensure jenkins' pubkey is loaded
+        # ensure gocd's pubkey is loaded
         if not nova.keypairs.findall(name=self.sshkeyname):
-            with open(os.path.expanduser('/var/lib/jenkins/.ssh/id_rsa.pub')) as fpubkey:
+            with open(os.path.expanduser('/var/go/.ssh/gocd.pub')) as fpubkey:
                 nova.keypairs.create(name=self.sshkeyname, public_key=fpubkey.read())
 
         image = nova.images.find(name=self.imagename)
