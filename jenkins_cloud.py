@@ -18,7 +18,7 @@ class cloudslave:
         nova = nvclient.Client(**creds)
 
         # ensure jenkins' pubkey is loaded
-        if not nova.keypairs.findall(name="jenkins"):
+        if not nova.keypairs.findall(name=self.sshkeyname):
             with open(os.path.expanduser('/var/lib/jenkins/.ssh/id_rsa.pub')) as fpubkey:
                 nova.keypairs.create(name=self.sshkeyname, public_key=fpubkey.read())
 
@@ -31,7 +31,7 @@ class cloudslave:
             raise Exception('Could not find flavor...')
 
         # spin up a cloud instance!!
-        self.instance = nova.servers.create(name=self.name, image=image, flavor=flavor, key_name="jenkins", nics=[{'net-id':'eadc7a9b-2ced-4b75-9915-552e6d09da3f'}])  #TODO: figure out how to determine net-id
+        self.instance = nova.servers.create(name=self.name, image=image, flavor=flavor, key_name=self.sshkeyname, nics=[{'net-id':'eadc7a9b-2ced-4b75-9915-552e6d09da3f'}])  #TODO: figure out how to determine net-id
 
         # Poll at 5 second intervals, until the status is no longer 'BUILD'
         status = self.instance.status
