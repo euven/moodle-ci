@@ -8,6 +8,6 @@ if __name__ == "__main__":
     minion = cloudslave(instancename)
     if minion.spindown():
         print "Cloud instance %s deleted" % instancename
-	time.sleep(15)  # ensure all resources have been released
+	time.sleep(25)  # ensure all resources have been released
     else:
         print "No cloud instance to delete ;)"
