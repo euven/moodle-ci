@@ -29,6 +29,8 @@ cleanup() {
 
     # clean the workspace, as we need to conserve space
     rm -rf $WORKSPACE
+
+    rm /tmp/$BUILDNAME
 }
 
 if [ ! -f /tmp/$BUILDNAME ]; then
