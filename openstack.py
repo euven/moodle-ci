@@ -1,6 +1,6 @@
 import os
 import time
-import novaclient.v1_1.client as nvclient
+from novaclient import client
 import novaclient.exceptions
 from credentials import get_nova_creds
 
@@ -15,7 +15,7 @@ class cloudslave:
     def spinup(self):
         # initialise novaclient instance
         creds = get_nova_creds()
-        nova = nvclient.Client(**creds)
+        nova = client.Client('2', **creds)
 
         # ensure gocd's pubkey is loaded
         if not nova.keypairs.findall(name=self.sshkeyname):
@@ -50,7 +50,7 @@ class cloudslave:
 	for fip in floating_ips:
             if fip.instance_id is None:  # not assigned to another instance
                 self.ip = fip.ip
-        	self.instance.add_floating_ip(self.ip)
+                self.instance.add_floating_ip(self.ip)
                 break
         try:
             self.ip
@@ -64,7 +64,7 @@ class cloudslave:
 
     def spindown(self):
         creds = get_nova_creds()
-        nova = nvclient.Client(**creds)
+        nova = client.Client('2', **creds)
 
 	maxtries = 10
 	trycount = 0

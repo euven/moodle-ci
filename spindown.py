@@ -1,6 +1,6 @@
 import sys
 import time
-from jenkins_cloud import cloudslave
+from openstack import cloudslave
 
 if __name__ == "__main__":
     instancename = sys.argv[1]  # use argparse to be proper :D
