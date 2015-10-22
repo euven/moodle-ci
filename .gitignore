@@ -1,4 +1,5 @@
 config.sh
+config.ini
 .ssh
 *.pyc
 composer.phar

@@ -3,14 +3,18 @@ import time
 from novaclient import client
 import novaclient.exceptions
 from credentials import get_nova_creds
+import ConfigParser
 
 class cloudslave:
     def __init__(self, name):
+        # read the config
+        config = ConfigParser.ConfigParser()
+        config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.ini'))
+
         self.name = name
-        self.imagename = "jenkins-tests"
-        self.flavorname = "c1.c4r4"
-        #self.flavorname = "c1.c8r8"
-        self.sshkeyname = "jenkins"
+        self.imagename = config.get('openstack', 'imagename')
+        self.flavorname = config.get('openstack', 'flavor')
+        self.sshkeyname = config.get('openstack', 'sshkeyname')
 
     def spinup(self):
         # initialise novaclient instance
