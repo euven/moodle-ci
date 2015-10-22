@@ -19,6 +19,7 @@ sudo apt-get install zip python-pip python-dev
 sudo pip install python-novaclient
 ```
 * Create an ssh key pair for jenkins; add the public key to openstack, with a key name of: jenkins
+* Copy config-dist.ini to config.ini and edit
 * As the jenkins user, checkout this repo to `/var/lib/jenkins/moodle-ci`
 * Download Selenium's standalone server (version: $SELENIUM_VERSION) and stick it in `/var/lib/jenkins/moodle-ci/` too
 * `cp config-dist.sh config.sh` and fill in creds
