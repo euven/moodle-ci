@@ -75,8 +75,7 @@ ssh $nohostkeycheck ubuntu@$cloudip "sudo cp -a /var/lib/postgresql /mnt/ramdisk
 ssh $nohostkeycheck ubuntu@$cloudip "sudo rm /usr/bin/firefox && sudo cp -a /usr/lib/firefox /mnt/ramdisk/. && sudo ln -s /mnt/ramdisk/firefox/firefox.sh /usr/bin/firefox"
 
 #code
-cd $WORKSPACE && git archive --format=zip --output=code.zip HEAD && scp $nohostkeycheck code.zip ubuntu@$cloudip:
-ssh $nohostkeycheck ubuntu@$cloudip "unzip -q code.zip -d /mnt/ramdisk/code"
+rsync -e "ssh $nohostkeycheck" -az --exclude '.git' $WORKSPACE/ ubuntu@$cloudip:/mnt/ramdisk/code
 
 ## todo: put the files copies below in for loop!
 #lint checker
