@@ -2,6 +2,7 @@
 
 source envrc
 CODEHOME=/mnt/ramdisk/code
+SITEDATAROOT=/mnt/ramdisk/sitedata
 DEFAULTPORT=7000
 
 #check if this version has phpunit
@@ -19,8 +20,8 @@ echo "RUNNING PHPUNIT TESTS"
 ## SETUP
 ##
 
-mkdir -p /mnt/ramdisk/sitedata/phpunit-$DEFAULTPORT
-mkdir -p /mnt/ramdisk/sitedata/site  # some fake shiz that's needed
+mkdir -p $SITEDATAROOT/phpunit-$DEFAULTPORT
+mkdir -p $SITEDATAROOT/site  # some fake shiz that's needed
 
 dropdb db-$DEFAULTPORT > /dev/null 2>&1  # just in case ;)
 createdb -E utf8 db-$DEFAULTPORT
