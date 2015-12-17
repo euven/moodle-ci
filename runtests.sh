@@ -11,15 +11,7 @@ echo ""
 echo "########## Spawn cloud instance"
 echo ""
 
-source $HOME/moodle-ci/config.sh
-python $HOME/moodle-ci/spinup.py $BUILDNAME  # this will write an ip to a file in /tmp
-retval=$?
-if [ ! $retval -eq 0 ]; then
-    echo "Cloud instance creation failed :("
-    exit 1
-fi
-
-# add a trap here to clean up the cloud if anything goes wrang from now on
+# add a trap to clean up stuff if anything goes wrang
 trap "cleanup" SIGHUP SIGINT SIGTERM SIGQUIT EXIT
 cleanup() {
 
@@ -32,6 +24,14 @@ cleanup() {
 
     rm /tmp/$BUILDNAME
 }
+
+source $HOME/moodle-ci/config.sh
+python $HOME/moodle-ci/spinup.py $BUILDNAME  # this will write an ip to a file in /tmp
+retval=$?
+if [ ! $retval -eq 0 ]; then
+    echo "Cloud instance creation failed :("
+    exit 1
+fi
 
 if [ ! -f /tmp/$BUILDNAME ]; then
     echo "could not find cloud instance for this job..."
