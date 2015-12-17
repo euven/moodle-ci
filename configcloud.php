@@ -13,6 +13,8 @@ if (getenv('PHPPORT')) {  // set by behat tests
     $phpport = $_SERVER['SERVER_PORT'];
 }
 
+$sitedataroot = "/mnt/ramdisk/sitedata";
+
 $CFG->dbtype    = 'pgsql';
 #$CFG->dbtype    = 'mysqli';
 $CFG->dblibrary = 'native';
@@ -27,7 +29,7 @@ $CFG->dboptions = array (
 );
 
 $CFG->wwwroot   = 'http://127.0.0.1';
-$CFG->dataroot  = '/mnt/ramdisk/sitedata/site';  # just a real fake, cos it's needed :D
+$CFG->dataroot  = $sitedataroot.'/site';  # just a real fake, cos it's needed :D
 $CFG->admin     = 'admin';
 
 $CFG->directorypermissions = 0777;
@@ -38,7 +40,7 @@ $CFG->noemailever = true;  // turn off all emails
 
 #behat setup
 $CFG->behat_prefix = 'behat_';
-$CFG->behat_dataroot = '/mnt/ramdisk/sitedata/behat-'.$phpport;
+$CFG->behat_dataroot = $sitedataroot.'/behat-'.$phpport;
 $CFG->behat_wwwroot   = 'http://localhost:'.$phpport;
 
 $CFG->behat_config = array(
@@ -61,9 +63,9 @@ $CFG->behat_config = array(
 
 #phpunit setup
 $CFG->phpunit_prefix = 'phpu_';
-$CFG->phpunit_dataroot = '/mnt/ramdisk/sitedata/phpunit-'.$phpport;
+$CFG->phpunit_dataroot = $sitedataroot.'/phpunit-'.$phpport;
 
-unset($phpport);
+unset($phpport, $sitedataroot);
 
 require_once(dirname(__FILE__) . '/lib/setup.php');
 

@@ -15,6 +15,7 @@ class cloudslave:
         self.imagename = config.get('openstack', 'imagename')
         self.flavorname = config.get('openstack', 'flavor')
         self.sshkeyname = config.get('openstack', 'sshkeyname')
+        self.netid = config.get('openstack', 'netid')
 
     def spinup(self):
         # initialise novaclient instance
@@ -35,7 +36,7 @@ class cloudslave:
             raise Exception('Could not find flavor...')
 
         # spin up a cloud instance!!
-        self.instance = nova.servers.create(name=self.name, image=image, flavor=flavor, key_name=self.sshkeyname, nics=[{'net-id':'eadc7a9b-2ced-4b75-9915-552e6d09da3f'}])  #TODO: figure out how to determine net-id
+        self.instance = nova.servers.create(name=self.name, image=image, flavor=flavor, key_name=self.sshkeyname, nics=[{'net-id':self.netid}])  #TODO: figure out how to determine net-id
 
         # Poll at 5 second intervals, until the status is no longer 'BUILD'
         status = self.instance.status
@@ -70,22 +71,24 @@ class cloudslave:
         creds = get_nova_creds()
         nova = client.Client('2', **creds)
 
-	maxtries = 10
-	trycount = 0
-	while 1:
+        maxtries = 10
+        trycount = 0
+        while 1:
             try:
-	        instance = nova.servers.find(name=self.name)
+                instance = nova.servers.find(name=self.name)
                 if instance:
                     instance.delete()
                     return True
                 else:
                     return False
-            except novaclient.exceptions.ClientException:
-                print 'Problem retrieving server instance...'
+            except Exception as e:
+                print 'Problem retrieving/deleting server instance...'
+                print str(e)
+
                 if trycount > maxtries:
-                    return False
+                    raise
 
                 print 'retrying...'
-                time.sleep(5)  # wait a bit and try again
+                time.sleep(10)  # wait a bit and try again
                 trycount = trycount + 1
                 continue
