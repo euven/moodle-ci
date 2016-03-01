@@ -100,7 +100,7 @@ scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-$SELENIUM_VERSION
 
 #composer cache, so we don't need to download all the packages every time (behat-relevant)
 if [ -f $HOME/.composer ]; then
-    scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip
+    scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
 fi
 
 #create and copy env file
