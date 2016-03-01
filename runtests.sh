@@ -98,9 +98,9 @@ scp $nohostkeycheck $HOME/moodle-ci/configcloud.php ubuntu@$cloudip:config.php
 #selenium server
 scp $nohostkeycheck $HOME/moodle-ci/selenium-server-standalone-$SELENIUM_VERSION.jar ubuntu@$cloudip:selenium-server-standalone.jar
 
-#composer cache, so we don't need to download all the packages every time (behat-relevant)
-if [ -f $HOME/.composer ]; then
-    scp -r $nohostkeycheck $HOME/.composer ubuntu@$cloudip:
+#composer cache, so we don't need to download all the packages every time
+if [ -f $HOME/composercache ]; then
+    scp -r $nohostkeycheck $HOME/composercache ubuntu@$cloudip:.cache/composer
 fi
 
 #create and copy env file
@@ -153,5 +153,5 @@ fi
 
 # sync back any composer cache updates (behat-relevant)
 if (ssh $nohostkeycheck ubuntu@$cloudip [ -d .composer ]); then
-	rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.composer/ $HOME/.composer
+	rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.cache/composer $HOME/composercache
 fi
