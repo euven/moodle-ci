@@ -153,5 +153,5 @@ fi
 
 # sync back any composer cache updates (behat-relevant)
 if (ssh $nohostkeycheck ubuntu@$cloudip [ -d .composer ]); then
-	rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.cache/composer $HOME/composercache
+	rsync -e "ssh $nohostkeycheck" -a --delete ubuntu@$cloudip:.cache/composer/ $HOME/composercache/
 fi
