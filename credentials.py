@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 
+
 def get_keystone_creds():
     d = {}
     d['username'] = os.environ['OS_USERNAME']
@@ -8,6 +9,7 @@ def get_keystone_creds():
     d['auth_url'] = os.environ['OS_AUTH_URL']
     d['tenant_name'] = os.environ['OS_TENANT_NAME']
     return d
+
 
 def get_nova_creds():
     d = {}
