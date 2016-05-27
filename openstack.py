@@ -1,15 +1,18 @@
 import os
 import time
 from novaclient import client
-import novaclient.exceptions
 from credentials import get_nova_creds
 import ConfigParser
 
-class cloudslave:
+SSH_PUBKEY = '/var/lib/jenkins/.ssh/id_rsa.pub'
+
+
+class CloudSlave:
     def __init__(self, name):
         # read the config
         config = ConfigParser.ConfigParser()
-        config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.ini'))
+        config.read(os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), 'config.ini'))
 
         self.name = name
         self.imagename = config.get('openstack', 'imagename')
@@ -24,8 +27,9 @@ class cloudslave:
 
         # ensure jenkins' pubkey is loaded
         if not nova.keypairs.findall(name=self.sshkeyname):
-            with open(os.path.expanduser('/var/lib/jenkins/.ssh/id_rsa.pub')) as fpubkey:
-                nova.keypairs.create(name=self.sshkeyname, public_key=fpubkey.read())
+            with open(os.path.expanduser(SSH_PUBKEY)) as fpubkey:
+                nova.keypairs.create(
+                    name=self.sshkeyname, public_key=fpubkey.read())
 
         image = nova.images.find(name=self.imagename)
         if not image:
@@ -36,12 +40,18 @@ class cloudslave:
             raise Exception('Could not find flavor...')
 
         # spin up a cloud instance!!
-        self.instance = nova.servers.create(name=self.name, image=image, flavor=flavor, key_name=self.sshkeyname, nics=[{'net-id':self.netid}])  #TODO: figure out how to determine net-id
+        # TODO: figure out how to determine net-id
+        self.instance = nova.servers.create(
+            name=self.name,
+            image=image,
+            flavor=flavor,
+            key_name=self.sshkeyname,
+            nics=[{'net-id': self.netid}])
 
         # Poll at 5 second intervals, until the status is no longer 'BUILD'
         status = self.instance.status
         while status == 'BUILD':
-            print 'Building minion %s' % self.name
+            print('Building minion %s' % self.name)
             time.sleep(5)
             # Retrieve the instance again so the status field updates
             self.instance = nova.servers.get(self.instance.id)
@@ -51,8 +61,9 @@ class cloudslave:
         floating_ips = nova.floating_ips.list()
         if not floating_ips:
             self.instance.delete()
-            raise Exception('No floating ips in pool :(') # todo: try creating some?
-	for fip in floating_ips:
+            # TODO: try creating some?
+            raise Exception('No floating ips in pool :(')
+        for fip in floating_ips:
             if fip.instance_id is None:  # not assigned to another instance
                 self.ip = fip.ip
                 self.instance.add_floating_ip(self.ip)
@@ -61,9 +72,10 @@ class cloudslave:
             self.ip
         except:
             self.instance.delete()
-            raise Exception('No available floating ips :(') # todo: try creating some?
+            # TODO: try creating some?
+            raise Exception('No available floating ips :(')
 
-        #time.sleep(10) # sleep a bit, while the floating ip gets sorted
+        # time.sleep(10)  # sleep a bit, while the floating ip gets sorted
 
         return self.ip
 
@@ -82,13 +94,13 @@ class cloudslave:
                 else:
                     return False
             except Exception as e:
-                print 'Problem retrieving/deleting server instance...'
-                print str(e)
+                print('Problem retrieving/deleting server instance...')
+                print(str(e))
 
                 if trycount > maxtries:
                     raise
 
-                print 'retrying...'
+                print('retrying...')
                 time.sleep(10)  # wait a bit and try again
                 trycount = trycount + 1
                 continue
