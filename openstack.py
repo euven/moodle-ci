@@ -1,6 +1,7 @@
 import os
 import time
 from novaclient import client
+import novaclient.exceptions
 from credentials import get_nova_creds
 import ConfigParser
 
@@ -39,6 +40,9 @@ class CloudSlave:
         if not flavor:
             raise Exception('Could not find flavor...')
 
+        # Get a floating IP early to fail faster if we are over quota
+        floating_ip = nova.floating_ips.create()
+
         # spin up a cloud instance!!
         # TODO: figure out how to determine net-id
         self.instance = nova.servers.create(
@@ -58,24 +62,12 @@ class CloudSlave:
             status = self.instance.status
 
         # assign floating ip
-        floating_ips = nova.floating_ips.list()
-        if not floating_ips:
-            self.instance.delete()
-            # TODO: try creating some?
-            raise Exception('No floating ips in pool :(')
-        for fip in floating_ips:
-            if fip.instance_id is None:  # not assigned to another instance
-                self.ip = fip.ip
-                self.instance.add_floating_ip(self.ip)
-                break
         try:
-            self.ip
+            self.instance.add_floating_ip(floating_ip)
+            self.ip = floating_ip.ip
         except:
             self.instance.delete()
-            # TODO: try creating some?
-            raise Exception('No available floating ips :(')
-
-        # time.sleep(10)  # sleep a bit, while the floating ip gets sorted
+            raise
 
         return self.ip
 
@@ -88,11 +80,20 @@ class CloudSlave:
         while 1:
             try:
                 instance = nova.servers.find(name=self.name)
-                if instance:
-                    instance.delete()
-                    return True
-                else:
-                    return False
+                # Release/delete the associated floating IP first
+                try:
+                    floating_ip = nova.floating_ips.find(
+                        instance_id=instance.id)
+                    floating_ip.delete()
+                except novaclient.exceptions.NotFound:
+                    # No floating IP assigned, it's alright
+                    pass
+                # Then delete the instance
+                instance.delete()
+                return True
+            except novaclient.exceptions.NotFound:
+                # Instance does not exist, nothing to do
+                return False
             except Exception as e:
                 print('Problem retrieving/deleting server instance...')
                 print(str(e))
@@ -100,7 +101,6 @@ class CloudSlave:
                 if trycount > maxtries:
                     raise
 
-                print('retrying...')
+                print('Retrying in 10s...')
                 time.sleep(10)  # wait a bit and try again
-                trycount = trycount + 1
-                continue
+                trycount += 1
