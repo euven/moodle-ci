@@ -1,10 +1,10 @@
 import sys
-from openstack import cloudslave
+from openstack import CloudSlave
 
 if __name__ == "__main__":
     instancename = sys.argv[1]  # use argparse to be proper :D
 
-    minion = cloudslave(instancename)
+    minion = CloudSlave(instancename)
     instanceip = minion.spinup()
 
     # write ip to a file, to be picked up by bash
@@ -14,5 +14,5 @@ if __name__ == "__main__":
     f.write(instanceip)
     f.truncate()  # truncate any following lines, just in case
     f.close()
-    
-    print 'Cloud instance up at %s!' % instanceip
+
+    print('Cloud instance up at %s!' % instanceip)
