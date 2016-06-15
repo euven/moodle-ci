@@ -1,11 +1,10 @@
 #!/bin/bash
 
+source $HOME/config.sh
+
 TESTSUITE=$1  # a full suite name
 PHPUNITTEST=`echo "$TESTSUITE" | awk '{print $1}'``echo "$TESTSUITE" | md5sum | awk '{print $1}'`  # add md5 for some uniqueness
 export PHPUNITTEST
-CODEHOME=/mnt/ramdisk/code
-SITEDATAROOT=/mnt/ramdisk/sitedata
-DEFAULTPORT=7000  # the default port set in configcloud.php, when no port is present
 
 # cleanup function
 cleanup() {

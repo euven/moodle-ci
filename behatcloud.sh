@@ -1,10 +1,9 @@
 #!/bin/bash
 
-source envrc
-WORKSPACE=/mnt/ramdisk/code
+source $HOME/config.sh
 
 #check if this version has behat
-moodleversion=$(grep "\$release" $WORKSPACE/version.php | awk '{print $3}' | sed "s/'//g")
+moodleversion=$(grep "\$release" $CODEHOME/version.php | awk '{print $3}' | sed "s/'//g")
 if [[ $moodleversion < 2.5 ]]
 then
     echo "No behat for this version of Moodle/Totara, so nothing to do :)"
@@ -25,17 +24,13 @@ createdb -E utf8 db-7000
 #add selenium - no way to get most current version yet :( #todo
 #wget --no-verbose http://selenium-release.storage.googleapis.com/2.42/selenium-server-standalone-2.42.2.jar -O selenium-server-standalone.jar
 
-
 #add composer
-cd $WORKSPACE
+cd $CODEHOME
 curl http://getcomposer.org/installer | php
 php composer.phar config github-oauth.github.com $GITHUB_TOKEN  # to deal with github limits
 
-#add config
-cp $HOME/config.php $WORKSPACE/.
-
 #set up behat
-php $WORKSPACE/admin/tool/behat/cli/init.php || exit 1
+php $CODEHOME/admin/tool/behat/cli/init.php || exit 1
 
 
 ###
@@ -70,9 +65,9 @@ done
 ###
 echo "RUNNING BEHAT TESTS"
 # find all feature files - make sure the biggest tests get run first, to ensure max cpu utilisation
-#find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | parallel --jobs 60% --delay 7 bash $HOME/testbehatfeature.sh {}
+#find $CODEHOME ! -path "$CODEHOME/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | parallel --jobs 60% --delay 7 bash $HOME/testbehatfeature.sh {}
 
 # only run the @catalyst tagged tests
-find $WORKSPACE ! -path "$WORKSPACE/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | xargs grep -l "@catalyst" | parallel --jobs 60% --delay 7 bash $HOME/testbehatfeature.sh {}
+find $CODEHOME ! -path "$CODEHOME/vendor/*" -type f -name '*.feature' -printf '%s %p\n' | sort -rn | awk '{print $2}' | xargs grep -l "@catalyst" | parallel --jobs 60% --delay 7 bash $HOME/moodle-ci/testbehatfeature.sh {}
 
 exit $?
